@@ -1,0 +1,64 @@
+ibm:
+    banners: >
+        declare @P_SVC_CD varchar(50) = #{svcCd}
+        select a.SVC_CD as svcCd
+                , b.BNR_NO as bnrNo
+                , b.BNR_TYPE as bnrType
+                , b.BNR_NM as bnrNm
+                , b.END_TYPE as endType
+                , b.DEVC as device
+                , b.CONTNT_TYPE as contentType
+                , b.PC_VOD_URL as pcVodUrl
+                , b.MOBILE_VOD_URL as mobileVodUrl
+                , b.LOC_TYPE as locType
+                , b.LINK_CNT as linkCnt
+                , b.PC_IMG_URL as pcImgUrl
+                , b.MOBILE_IMG_URL as mobileImgUrl
+                , b.BNR_SORT as bnrSort
+                , b.CALBAK as callback
+        from IBM_SERVICE_BANNER As a with(nolock)
+            inner join IBM_BANNER As b with(nolock) on (b.BNR_NO = a.BNR_NO)
+        where 1=1
+        and a.SVC_CD = @P_SVC_CD
+        and b.DEL_YN = 'N'
+        and b.SVC_YN = 'Y'
+        and convert(varchar, b.EXPSR_START_DATE) + ' ' + convert(varchar, b.EXPSR_START_TM) <= getdate()
+        and convert(varchar, b.EXPSR_END_DATE) + ' ' + convert(varchar, b.EXPSR_END_TM) >= getdate()
+        order by NEWID()
+    
+    banners-preview: >
+        declare @P_SVC_CD varchar(50) = #{svcCd}
+                ,@P_BNR_NO int = #{bnrNo}
+
+        select a.SVC_CD as svcCd
+                , b.BNR_NO as bnrNo
+                , b.BNR_TYPE as bnrType
+                , b.BNR_NM as bnrNm
+                , b.END_TYPE as endType
+                , b.DEVC as device
+                , b.CONTNT_TYPE as contentType
+                , b.PC_VOD_URL as pcVodUrl
+                , b.MOBILE_VOD_URL as mobileVodUrl
+                , b.LOC_TYPE as locType
+                , b.LINK_CNT as linkCnt
+                , b.PC_IMG_URL as pcImgUrl
+                , b.MOBILE_IMG_URL as mobileImgUrl
+                , b.BNR_SORT as bnrSort
+                , b.CALBAK as callback
+        from IBM_SERVICE_BANNER As a with(nolock)
+            inner join IBM_BANNER As b with(nolock) on (b.BNR_NO = a.BNR_NO)
+        where 1=1
+        and a.SVC_CD = @P_SVC_CD
+        and b.DEL_YN = 'N'
+        and a.BNR_NO = @P_BNR_NO
+        order by NEWID()
+
+    links: >
+        declare @P_BNR_NO int = #{bnrNo}
+        select a.DEVC as device
+                ,a.LINK_TYPE as linkType
+                ,a.LINK_ADDR as linkAddr
+        from IBM_BANNER_CONNECT As a with(nolock)
+        where 1=1
+        and a.BNR_NO = @P_BNR_NO
+        order by a.DEVC, a.IDX
